@@ -30,7 +30,7 @@ class Graph {
     constructor(width, height) {
         this.width = width; // numColumns in grid (x-axis)
         this.height = height; // numRows in grid (y-axis)
-        this.blockades = []; // grid cells you can't pass through
+        this.blockades = {}; // grid cells you can't pass through
     }
 
     inBounds(cellId) {
@@ -39,17 +39,7 @@ class Graph {
     } 
 
     passable(cellId) {
-        let [x,y] = cellId;
-        let passable = true; // assume grid cell passable 
-
-        // if grid cell in blockades arr, passable = false
-        for (let i = 0; i < this.blockades.length; i++) {
-            let [blockadeX, blockadeY] = this.blockades[i];
-            if (blockadeX === x && blockadeY === y) {
-                passable = false;
-            }
-        };
-        return passable
+        return (!this.blockades[cellId])
     }
 
     neighbors(cellId) {
@@ -88,11 +78,8 @@ class Graph {
         if (style['path'] && x1 === style['destination'][0] && x2 === style['destination'][1]) {
             cellText = '@';
         }
-        for (let i = 0; i < this.blockades.length; i++) {
-            let [blockadeX, blockadeY] = this.blockades[i];
-            if (x1 === blockadeX && y1 === blockadeY) {
-                cellText = '#';
-            }
+        if (this.blockades[cellId]) {
+            cellText = '#';
         }
         return cellText
     }
@@ -130,10 +117,17 @@ function breadth_first_search(graph, startLocation) {
 }
 
 let g1 = new Graph(3,3);
-g1.blockades = [[1,0], [1,1]];
+// g1.blockades = [[1,0], [1,1]];
+g1.blockades[[1,0]] = true;
+g1.blockades[[1,1]] = true;
+
+console.log(g1.blockades[[1,0]])
+
 let cameFrom = breadth_first_search(g1, [0,0]);
 
 g1.drawGrid({pointTo:cameFrom, start: [0,0]});
+
+g1.drawGrid({})
 
 // function reconstruct_path(cameFrom, start, goal) {
 //     let current = goal; 
