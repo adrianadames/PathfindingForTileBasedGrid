@@ -96,7 +96,7 @@ class Graph {
     }
 }
 
-function breadth_first_search(graph, startLocation) {
+function breadth_first_traversal(graph, startLocation) {
     let frontier = new Queue; 
     frontier.enqueue(startLocation);
     let cameFrom = {};
@@ -114,6 +114,32 @@ function breadth_first_search(graph, startLocation) {
         }
     }
     // console.log('cameFrom: ', cameFrom);
+    return cameFrom
+}
+
+function breadth_first_search(graph, startLocation, goalLocation) {
+    let frontier = new Queue; 
+    frontier.enqueue(startLocation);
+    let cameFrom = {};
+    cameFrom[startLocation] = null;
+
+    while (frontier.items.length > 0) {
+        let currentLocation = frontier.dequeue();
+
+        if (currentLocation[0] === goalLocation[0] && currentLocation[1] === goalLocation[1]) {
+            break;
+        }
+
+        let neighbors = graph.neighbors(currentLocation);
+
+        for (let i = 0; i <neighbors.length; i++) {
+            if (!cameFrom[neighbors[i]]) {
+                frontier.enqueue(neighbors[i]);
+                cameFrom[neighbors[i]] = currentLocation;
+            }
+        }
+    }
+    console.log('cameFrom: ', cameFrom);
     return cameFrom
 }
 
@@ -137,7 +163,7 @@ let g1 = new Graph(3,3);
 g1.blockades[[1,0]] = true;
 g1.blockades[[1,1]] = true;
 
-let cameFrom = breadth_first_search(g1, [0,0]);
+let cameFrom = breadth_first_traversal(g1, [0,0]);
 
 g1.drawGrid({pointTo:cameFrom, start: [0,0]});
 // yields the following: 
@@ -169,15 +195,24 @@ g2.drawGrid({});
 //      ...#....
 //      ...#....
 
-let cameFrom2 = breadth_first_search(g2, [0,0]);
+// let cameFrom2 = breadth_first_traversal(g2, [0,0]);
+let cameFrom2 = breadth_first_search(g2, [0,0], [0,4]);
 
-g2.drawGrid({pointTo:cameFrom2, start: [0,0]});
+g2.drawGrid({pointTo:cameFrom2, start: [0,0], goal:[0,4]});
 // yields the following: 
+//      S#...#..
+//      ↑#...#..
+//      ↑#.#....
+//      ↑←.#....
+//      ↑..#....
+
+// g2.drawGrid({pointTo:cameFrom2, start: [0,0]});
+// // yields the following: 
 //      S#↓←←#↓←
 //      ↑#↓←←#↓←
 //      ↑#↓#↑←←←
 //      ↑←←#↑←←←
 //      ↑←←#↑←←←
 
-let path2 = reconstructPath(cameFrom2, [0,0], [7,0])
-// console.log('path2: ', path2)
+let path2 = reconstructPath(cameFrom2, [0,0], [0,4])
+console.log('path2: ', path2)
