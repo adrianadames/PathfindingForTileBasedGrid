@@ -100,6 +100,7 @@ function breadth_first_search(graph, startLocation) {
     let frontier = new Queue; 
     frontier.enqueue(startLocation);
     let cameFrom = {};
+    cameFrom[startLocation] = null;
 
     while (frontier.items.length > 0) {
         let currentLocation = frontier.dequeue();
@@ -116,55 +117,67 @@ function breadth_first_search(graph, startLocation) {
     return cameFrom
 }
 
+function reconstructPath(cameFrom, start, goal) {
+    let [xCurrent, yCurrent] = goal;
+    let [xStart, yStart] = start;
+    let path = [];
+
+    while (!(xCurrent === xStart && yCurrent === yStart)) {
+        path.push([xCurrent, yCurrent]);
+        [xCurrent, yCurrent] = cameFrom[[xCurrent, yCurrent]];
+    }
+    path.push([xStart, yStart]); 
+    path.reverse();
+    // console.log('path: ', path);
+    return path
+}
+
+
 let g1 = new Graph(3,3);
-// g1.blockades = [[1,0], [1,1]];
 g1.blockades[[1,0]] = true;
 g1.blockades[[1,1]] = true;
-
-console.log(g1.blockades[[1,0]])
 
 let cameFrom = breadth_first_search(g1, [0,0]);
 
 g1.drawGrid({pointTo:cameFrom, start: [0,0]});
+// yields the following: 
+//          S#↓
+//          ↑#↓
+//          ↑←←
 
-g1.drawGrid({})
-
-// function reconstruct_path(cameFrom, start, goal) {
-//     let current = goal; 
-//     let path = [];
-//     while (current !== start) {
-//         console.log('current: ', current)
-//         path.push(current);
-//         current = cameFrom[current];
-        
-//     };
-//     path.reverse();
-//     console.log('path: ', path);
-//     return path
-// }
-
-// reconstruct_path(cameFrom, [0,0], [2,0])
+g1.drawGrid({});
+// yields the following: 
+//          .#.
+//          .#.
+//          ...
 
 
 
+let g2 = new Graph(8,5);
+let g2Blockades = [
+    [1,0], [1,1], [1,2], [3,2], [3,3], [3,4], [5,0], [5,1]
+];
+for (let i = 0; i < g2Blockades.length; i++) {
+    g2.blockades[g2Blockades[i]] = true;
+}
 
+g2.drawGrid({});
+// yields the following: 
+//      .#...#..
+//      .#...#..
+//      .#.#....
+//      ...#....
+//      ...#....
 
+let cameFrom2 = breadth_first_search(g2, [0,0]);
 
+g2.drawGrid({pointTo:cameFrom2, start: [0,0]});
+// yields the following: 
+//      S#↓←←#↓←
+//      ↑#↓←←#↓←
+//      ↑#↓#↑←←←
+//      ↑←←#↑←←←
+//      ↑←←#↑←←←
 
-// class Graph {
-//     neighbors()
-// }
-
-// class SimpleGraph {
-//     constructor(edges = {}) {
-//         this.edges = edges;
-//     }
-    
-//     neighbors(position) {
-//         return this.edges[position];
-//     }
-
-//     neighbors(vertex_id) {
-//         return this.edges[vertex_id];
-//     }
-// }
+let path2 = reconstructPath(cameFrom2, [0,0], [7,0])
+// console.log('path2: ', path2)
